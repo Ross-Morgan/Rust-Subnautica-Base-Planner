@@ -24,18 +24,24 @@ fn legnth_of_longest<'a>(array: &Vec<&'a str>) -> usize {
 }
 
 
-fn uniform_length_strings<'a>(array: &Vec<&'a str>) -> Vec<&'a str> {
-    let mut array_copy: Vec<&str> = array.to_vec();
-}
-
-
 fn fill_line(fill_char: &str, length: usize) -> String {
     // Create range of length 'n' and replace chars with chosen character
     return (0..length).map(|_| fill_char).collect::<String>();
 }
 
 
-fn pretty_print(lines: Vec<&str>, end_char: String) {
+fn uniform_length_strings<'a>(array: &Vec<&'a str>, length: usize) -> Vec<&'a str> {
+    let mut array_copy: Vec<&'a str> = vec![];
+
+    for mut s in array {
+        let spaces: String = fill_line(" ", length - s.len());
+    }
+
+    return array_copy;
+}
+
+
+fn pretty_print(lines: Vec<&str>, end_char: String, padding: usize) {
     // let mut new_lines: Vec<String> = lines.to_vec().iter().map(|&s| s.to_string()).collect();
     let mut new_lines: Vec<&str> = lines.to_vec();
     let mut fill_char: String;
@@ -64,6 +70,7 @@ fn pretty_print(lines: Vec<&str>, end_char: String) {
         let _ = std::mem::replace(&mut new_lines[index], &line);
     }
 
+    new_lines = uniform_length_strings(&new_lines, longest_line_length + padding);
 
     // Join new_lines to String and print it
     println!("{}", new_lines.into_iter().collect::<String>());
@@ -79,7 +86,7 @@ fn main() {
     // println!("            `help` to list valid names");
     // println!("------------------------------------------------------------------------------");
 
-    let lines: Vec<&str> = vec![
+    let messages: Vec<&str> = vec![
         "Subnautica Base Planner CLI",
         "<FILL>",
         "Use command `add {name} {quantity=1} {add_to_existing/ate=true}` to add item",
@@ -95,5 +102,5 @@ fn main() {
         "-"
     ];
 
-    pretty_print(lines, "|".to_string());
+    pretty_print(messages, "|".to_string(), 1);
 }
