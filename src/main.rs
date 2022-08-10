@@ -43,10 +43,12 @@ fn fill_line(fill_char: &str, length: usize) -> String {
 }
 
 
-fn uniform_length_strings<'a>(array: &Vec<&'a str>, target_length: Option<usize>, fill_char: Option<String>, end_char: Option<String>) -> Vec<String> {
+fn uniform_length_strings(array: &Vec<String>, target_length: Option<usize>, fill_char: Option<String>, end_char: Option<String>) -> Vec<String> {
     let t_length = target_length.unwrap_or(1 as usize);
     let f_char = fill_char.unwrap_or(" ".to_string());
-    let e_char = end_char.unwrap_or("|".to_string());
+    let mut e_char = end_char.unwrap_or("|".to_string());
+
+    e_char.push_str("\n");
 
     return array.into_iter().map(|s| format!("{}{}{}", s, fill_line(&f_char, t_length - s.len()), e_char)).collect::<Vec<String>>();
 }
@@ -67,17 +69,17 @@ fn pretty_print(lines: Vec<&str>, end_char: String, padding: usize) {
         break " ";
     };
 
-    let line = fill_line(fill_char, longest_line_length);
+    let line = &fill_line(fill_char, longest_line_length);
 
     loop {
         let index: usize = find_in_vec("<FILL>", &lines).unwrap_or(usize::MAX);
 
         if index == usize::MAX { break; }
 
-        let _ = std::mem::replace(&mut new_lines[index], line);
+        let _ = std::mem::replace(&mut new_lines[index], line.to_string());
     }
 
-    new_lines = uniform_length_strings(&new_lines.into_iter().map(|s| s.as_str()).collect::<Vec<&str>>(), Some(longest_line_length + padding), Some(" ".to_string()), Some(end_char));
+    new_lines = uniform_length_strings(&new_lines, Some(longest_line_length + padding), Some(" ".to_string()), Some(end_char));
 
     // Join new_lines to String and print it
     println!("{}", new_lines.into_iter().collect::<String>());
@@ -85,5 +87,5 @@ fn pretty_print(lines: Vec<&str>, end_char: String, padding: usize) {
 
 
 fn main() {
-    println!("{}", ENTRY_LINES.join("\n"))
+    pretty_print(ENTRY_LINES.to_vec(), "|".to_string(), 1);
 }
