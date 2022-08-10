@@ -1,3 +1,16 @@
+const TITLE: &'static str = "Subnautica Base Planner CLI";
+
+const ENTRY_LINES: [&str; 7] = [
+    TITLE,
+    "------------------------------------------------------------------------------",
+    "Use command `add {{name}} {{quantity=1}} {{add_to_existing/ate=True}}` to add item",
+    "            `set {{name}} {{quantity}}`",
+    "            `remove {{name}}` to remove item",
+    "            `help` to list valid names",
+    "------------------------------------------------------------------------------",
+];
+
+
 fn find_in_vec(value: &'static str, array: &Vec<&str>) -> Option<usize> {
     // Convert &Vec<&str> to Vec<String>
     let s_array: Vec<String> = array.to_owned().iter().map(|&s| s.to_string()).collect();
@@ -30,47 +43,41 @@ fn fill_line(fill_char: &str, length: usize) -> String {
 }
 
 
-fn uniform_length_strings<'a>(array: &Vec<&'a str>, length: usize) -> Vec<&'a str> {
-    let mut array_copy: Vec<&'a str> = vec![];
+fn uniform_length_strings<'a>(array: &Vec<&'a str>, target_length: Option<usize>, fill_char: Option<String>, end_char: Option<String>) -> Vec<String> {
+    let t_length = target_length.unwrap_or(1 as usize);
+    let f_char = fill_char.unwrap_or(" ".to_string());
+    let e_char = end_char.unwrap_or("|".to_string());
 
-    for mut s in array {
-        let spaces: String = fill_line(" ", length - s.len());
-    }
-
-    return array_copy;
+    return array.into_iter().map(|s| format!("{}{}{}", s, fill_line(&f_char, t_length - s.len()), e_char)).collect::<Vec<String>>();
 }
 
 
 fn pretty_print(lines: Vec<&str>, end_char: String, padding: usize) {
-    // let mut new_lines: Vec<String> = lines.to_vec().iter().map(|&s| s.to_string()).collect();
-    let mut new_lines: Vec<&str> = lines.to_vec();
-    let mut fill_char: String;
+    let mut new_lines: Vec<String> = lines.to_vec().iter().map(|&s| s.to_string()).collect();
 
     let longest_line_length: usize = legnth_of_longest(&lines);
 
-    // If <FILL> exists in list
-    if lines.iter().any(|&s| s=="<FILL>") {
-        fill_char = lines[lines.len() - 1].to_string();        // Set fill_char to last element of array
-        new_lines.pop();                                       // Remove last element of array
-    } else {
-        fill_char = String::new();
-    }
+    let fill_char = loop {
+        // If <FILL> exists in list
+        if lines.iter().any(|&s| s=="<FILL>") {
+            let c = lines[lines.len() - 1];
+            new_lines.pop();
+            break c;
+        }
+        break " ";
+    };
 
-    let line: String = fill_line(&fill_char, longest_line_length);
-
-    // while find_in_vec("<FILL>", &lines).unwrap_or(0 as usize) != 0 {
-
-    // }
+    let line = fill_line(fill_char, longest_line_length);
 
     loop {
         let index: usize = find_in_vec("<FILL>", &lines).unwrap_or(usize::MAX);
 
         if index == usize::MAX { break; }
 
-        let _ = std::mem::replace(&mut new_lines[index], &line);
+        let _ = std::mem::replace(&mut new_lines[index], line);
     }
 
-    new_lines = uniform_length_strings(&new_lines, longest_line_length + padding);
+    new_lines = uniform_length_strings(&new_lines.into_iter().map(|s| s.as_str()).collect::<Vec<&str>>(), Some(longest_line_length + padding), Some(" ".to_string()), Some(end_char));
 
     // Join new_lines to String and print it
     println!("{}", new_lines.into_iter().collect::<String>());
@@ -78,29 +85,5 @@ fn pretty_print(lines: Vec<&str>, end_char: String, padding: usize) {
 
 
 fn main() {
-    // println!("Subnautica Base Planner CLI");
-    // println!("------------------------------------------------------------------------------");
-    // println!("Use command `add {{name}} {{quantity=1}} {{add_to_existing/ate=True}}` to add item");
-    // println!("            `set {{name}} {{quantity}}`");
-    // println!("            `remove {{name}}` to remove item");
-    // println!("            `help` to list valid names");
-    // println!("------------------------------------------------------------------------------");
-
-    let messages: Vec<&str> = vec![
-        "Subnautica Base Planner CLI",
-        "<FILL>",
-        "Use command `add {name} {quantity=1} {add_to_existing/ate=true}` to add item",
-        "            `set {name} {quantity}`",
-        "            `remove {name} {const=false}` to remove item",
-        "            `clear` to remove all components",
-        "<FILL>",
-        "            `compute {item=null}` to print the materials needed for specified or all components",
-        "<FILL>",
-        "            `list` to show all added components",
-        "            `help` to list valid compontent names",
-        "<FILL>",
-        "-"
-    ];
-
-    pretty_print(messages, "|".to_string(), 1);
+    println!("{}", ENTRY_LINES.join("\n"))
 }
