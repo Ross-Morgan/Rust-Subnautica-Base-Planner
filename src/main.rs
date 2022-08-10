@@ -1,26 +1,39 @@
 const TITLE: &'static str = "Subnautica Base Planner CLI";
 
-const ENTRY_LINES: [&str; 7] = [
+const ENTRY_LINES: [&str; 8] = [
+    "----------------------------------------------------------------------------------",
     TITLE,
-    "------------------------------------------------------------------------------",
+    "----------------------------------------------------------------------------------",
     "Use command `add {{name}} {{quantity=1}} {{add_to_existing/ate=True}}` to add item",
     "            `set {{name}} {{quantity}}`",
     "            `remove {{name}}` to remove item",
     "            `help` to list valid names",
-    "------------------------------------------------------------------------------",
+    "----------------------------------------------------------------------------------",
 ];
+
+
+
+fn fill_line(fill_char: &str, length: usize) -> String {
+    // Create range of length 'n' and replace chars with chosen character
+    return (0..length).map(|_| fill_char).collect::<String>();
+}
 
 
 fn find_in_vec(value: &'static str, array: &Vec<&str>) -> Option<usize> {
     // Convert &Vec<&str> to Vec<String>
-    let s_array: Vec<String> = array.to_owned().iter().map(|&s| s.to_string()).collect();
+    let s_array: Vec<String> = array.to_owned().into_iter().map(|s| s.to_string()).collect::<Vec<String>>();
 
     // Return Option<{index of value}>
-    return s_array.iter().position(|x: &String| x == value);
+    return s_array.iter().position(|x| x == value);
 }
 
 
-fn legnth_of_longest<'a>(array: &Vec<&'a str>) -> usize {
+fn wrap_line(line: &str, wrap_char: &str, padding: usize) -> String {
+    format!("{}{}{}{}{}", wrap_char, fill_line(" ", padding), line, fill_line(" ", padding), wrap_char)
+}
+
+
+fn legnth_of_longest(array: &Vec<&str>) -> usize {
     if array.len() == 0 {
         return 0;
     }
@@ -34,12 +47,6 @@ fn legnth_of_longest<'a>(array: &Vec<&'a str>) -> usize {
             acc
         }
     }).len();
-}
-
-
-fn fill_line(fill_char: &str, length: usize) -> String {
-    // Create range of length 'n' and replace chars with chosen character
-    return (0..length).map(|_| fill_char).collect::<String>();
 }
 
 
