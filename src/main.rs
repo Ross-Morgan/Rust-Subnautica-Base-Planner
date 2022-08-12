@@ -28,13 +28,13 @@ fn find_in_vec(value: &'static str, array: &Vec<&str>) -> Option<usize> {
 }
 
 
-fn wrap_line(line: &str, wrap_char: &str, padding: usize) -> String {
-    format!("{}{}{}{}{}", wrap_char, fill_line(" ", padding), line, fill_line(" ", padding), wrap_char)
+fn wrap_line(line: &str, wrap_char: &str, pad_char: &str, padding: usize) -> String {
+    format!("{}{}{}{}{}", wrap_char, fill_line(pad_char, padding), line, fill_line(" ", padding), wrap_char)
 }
 
 
 fn wrap_lines(array: Vec<String>, wrap_char: &str, padding: usize) -> Vec<String> {
-    array.into_iter().map(|s| wrap_line(s.as_str(), wrap_char, padding)).collect::<Vec<String>>()
+    array.into_iter().map(|s| wrap_line(s.as_str(), wrap_char, " ", padding)).collect::<Vec<String>>()
 }
 
 
@@ -63,8 +63,8 @@ fn uniform_length_strings(array: Vec<String>, target_length: Option<usize>, fill
 }
 
 
-fn extend_lines<'a>(array: Vec<String>, s: &'a str) -> Vec<String> {
-    array.into_iter().map(|ele| format!("{}{}", ele, s)).collect::<Vec<String>>()
+fn extend_lines(array: Vec<String>, s: &str) -> Vec<String> {
+    array.into_iter().map(|ele| format!("{}{}", ele, s.to_owned())).collect::<Vec<String>>()
 }
 
 
@@ -73,14 +73,16 @@ fn pretty_print(lines: Vec<&str>, end_char: String, padding: usize) {
 
     let longest_line_length: usize = legnth_of_longest(&lines);
 
-    let fill_char = loop {
+    let fill_char = {
         // If <FILL> exists in list
+        let mut c = " ";
+
         if lines.iter().any(|&s| s=="<FILL>") {
-            let c = lines[lines.len() - 1];
             new_lines.pop();
-            break c;
+            c = lines[lines.len() - 1]
         }
-        break " ";
+
+        c
     };
 
     let filling_line = &fill_line(fill_char, longest_line_length);
