@@ -76,6 +76,8 @@ pub fn pretty_print(lines: Vec<&str>) {
 
     let new_lines: Vec<String> = lines
         .justify_lines()
+        .wrap_lines(" ")
+        .wrap_lines("|")
         .extend_lines("\n")
         .add_line("\x1b[A");
 
