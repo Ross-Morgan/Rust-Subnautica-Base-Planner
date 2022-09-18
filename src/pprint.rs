@@ -70,7 +70,7 @@ fn fill_line(fill_char: &str, length: usize) -> String {
 
 pub fn pretty_print(lines: Vec<&str>) {
     let lines: Vec<String> = lines
-        .into_iter()
+        .iter()
         .map(|s: &str| s.to_owned())
         .collect::<Vec<String>>();
 
