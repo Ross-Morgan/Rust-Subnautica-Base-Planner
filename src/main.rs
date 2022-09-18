@@ -1,35 +1,25 @@
-mod pretty_print;
-mod user_input;
+mod parse;
+mod pprint;
 
-use pretty_print::pprint;
-use user_input::simple_user_input::get_input;
-
-const TITLE: &'static str = "Subnautica Base Planner CLI";
-
-const ENTRY_LINES: [&str; 12] = [
-    "----------------------------------------------------------------------------------",
-    TITLE,
-    "----------------------------------------------------------------------------------",
-    "Use command `add {{name}} {{quantity=1}} {{add_to_existing/ate=True}}` to add item",
-    "            `set {{name}} {{quantity}}`",
-    "            `remove {{name}}` to remove item",
-    "            `help` to list valid names",
-    "----------------------------------------------------------------------------------",
-    "Use command `save` to leave the program",
-    "            `load` to leave the program",
-    "            `exit` to leave the program",
-    "----------------------------------------------------------------------------------",
-];
-
-const INPUT_PROMPT: &'static str = "sub-cli>";
-
+use std::process;
 
 fn main() {
-    pprint::pretty_print(ENTRY_LINES.to_vec(), "|".to_string(), 1);
+    let entry_lines: Vec<&str> = vec![
+        "--------------------------------------------------------",
+        "Subnautica Base Planner CLI",
+        "--------------------------------------------------------",
+        "Use command `add <name> <quantity=1> to add item",
+        "            `set <name> <quantity>` to set item quantity",
+        "            `remove <name> <quantity=1>` to remove item",
+        "            `howmany <name> to show quantity of item",
+        "            `list to list all added items`",
+        "            `help` to list valid names",
+        "--------------------------------------------------------",
+    ];
 
-    loop {
-        input = get_input(INPUT_PROMPT);
-    }
+    pprint::pretty_print(entry_lines);
 
+    let exit_code: i32 = parse::run_shell();
+
+    process::exit(exit_code);
 }
-
